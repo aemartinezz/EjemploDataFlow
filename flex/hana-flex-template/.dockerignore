@@ -1,0 +1,7 @@
+.venv
+git
+cache
+*.md
+__pycache__
+key.json
+.env

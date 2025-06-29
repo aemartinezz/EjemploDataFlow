@@ -1,0 +1,8 @@
+# =================================
+# Variables para Artifact Registry
+# =================================
+PIPELINE_K8S_SA: "crp-qas-portal-dataplatform-cicd-sa"
+IMAGE_REGISTRY: "us-east4-docker.pkg.dev"
+IMAGE_REPOSITORY: "sit-cicd-images-apps/liverpool-dataplatform-qas-images-apps"
+DATAFLOW_BUCKET: "crp-qas-data-platform-bkt01"
+SERVICE_PROJECT: "crp-qas-data-platform"

@@ -1,0 +1,91 @@
+{
+  "name": "API flex template",
+  "description": "API pipeline",
+  "parameters": [
+    {
+        "name": "dataflow_bucket_name",
+        "label": "dataflow_bucket_name",
+        "helpText": "gs://..."
+    },
+    {
+        "name": "dataflow_project",
+        "label": "dataflow_project",
+        "helpText": "Proyecto GCP"
+    },
+    {
+        "name": "target_project",
+        "label": "target_project",
+        "helpText": "Proyecto destino"
+    },
+    {
+        "name": "target_dataset",
+        "label": "target_dataset",
+        "helpText": "dataset destino"
+    },
+    {
+        "name": "target_table",
+        "label": "target_table",
+        "helpText": "Tabla destino"
+    },
+    {
+        "name": "pipeline_name",
+        "label": "pipeline_name",
+        "helpText": "nombre de pipeline"
+    },
+    {
+        "name": "stage",
+        "label": "stage",
+        "helpText": "stage (dev/qa/preprod/prod)"
+    },
+    {
+        "name": "temp_folder",
+        "label": "temp_folder",
+        "helpText": "gs://..."
+    },
+    {
+        "name": "api_host",
+        "label": "api_host",
+        "helpText": "api_host"
+    },
+    {
+        "name": "api_protocol",
+        "label": "api_protocol",
+        "helpText": "api_protocol"
+    },
+    {
+        "name": "api_method",
+        "label": "api_method",
+        "helpText": "api_method"
+    },
+    {
+        "name": "api_port",
+        "label": "api_port",
+        "helpText": "api_port"
+    },
+    {
+        "name": "api_headers",
+        "label": "api_headers",
+        "helpText": "api_headers"
+    },
+    {
+        "name": "api_queryparams",
+        "label": "api_queryparams",
+        "helpText": "api_queryparams"
+    },
+    {
+        "name": "api_pathparams",
+        "label": "api_pathparams",
+        "helpText": "api_pathparams"
+    },
+    {
+        "name": "run_id",
+        "label": "run_id",
+        "helpText": "run_id"
+    },
+    {
+        "name": "control_schema_path",
+        "label": "control_schema_path",
+        "helpText": "control_schema_path"
+    }
+  ]
+}

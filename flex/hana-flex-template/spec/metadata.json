@@ -1,0 +1,72 @@
+{
+  "name": "HANA flex template",
+  "description": "HANA pipeline",
+  "parameters": [
+    {
+        "name": "dataflow_bucket_name",
+        "label": "dataflow_bucket_name",
+        "helpText": "gs://..."
+    },
+    {
+        "name": "dataflow_project",
+        "label": "dataflow_project",
+        "helpText": "Proyecto GCP"
+    },
+    {
+        "name": "target_project",
+        "label": "target_project",
+        "helpText": "Proyecto destino"
+    },
+    {
+        "name": "target_dataset",
+        "label": "target_dataset",
+        "helpText": "Dataset destino"
+    },
+    {
+        "name": "target_table",
+        "label": "target_table",
+        "helpText": "Tabla destino"
+    },
+    {
+        "name": "pipeline_id",
+        "label": "pipeline_id",
+        "helpText": "pipeline id"
+    },
+    {
+        "name": "pipeline_name",
+        "label": "pipeline_name",
+        "helpText": "nombre de pipeline"
+    },
+    {
+        "name": "query",
+        "label": "query",
+        "helpText": "query"
+    },
+    {
+        "name": "secret_name_origin",
+        "label": "secret_name_origin",
+        "helpText": "Nombre de secret"
+    },
+    {
+        "name": "stage",
+        "label": "stage",
+        "helpText": "stage (dev/qa/preprod/prod)"
+    },
+    {
+        "name": "temp_folder",
+        "label": "temp_folder",
+        "helpText": "gs://..."
+    },
+    {
+        "name": "limit_init_load",
+        "label": "limite carga inicial",
+        "helpText": "100000"
+    },
+    {
+        "name": "debug",
+        "label": "debug",
+        "helpText": "debug",
+        "isOptional": true
+    }
+  ]
+}

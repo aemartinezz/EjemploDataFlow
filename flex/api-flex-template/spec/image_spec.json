@@ -1,0 +1,5 @@
+{
+  "docker_template_spec": {
+    "docker_image": "us-east4-docker.pkg.dev/sit-cicd-images-apps/liverpool-dataplatform-qas-images-apps/flex/api-flex-template"
+  }
+}

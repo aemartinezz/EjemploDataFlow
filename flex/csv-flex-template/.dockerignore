@@ -1,0 +1,8 @@
+.venv
+git
+cache
+*.md
+.idea
+__pycache__
+.env
+key.json

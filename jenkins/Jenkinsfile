@@ -1,0 +1,142 @@
+@Library([
+    'gcp-library@v1.0.0',
+    'common-library@v1.0.3'
+]) _
+
+def readVarsFromYaml(String readYamlFilePath){
+    """
+    Función para leer variables llave valor(String) desde un archivo yaml
+    """
+    if(fileExists(readYamlFilePath)){
+        def yamlFile = readYaml file: "$readYamlFilePath"
+        yamlFile.each { key, value ->
+            env."$key" = value
+            echo "Se crea variable $key = $value"
+        }
+    } else {
+        error "No se encontró archivo $readYamlFilePath en el workspace!"
+    }
+}
+
+def dockerStage(String flextemplate){
+    dir("flex/$flextemplate"){
+        sh( label: "Docker Build",
+            script:
+            """
+            /kaniko/executor --destination $IMAGE_REGISTRY/$IMAGE_REPOSITORY/flex/$flextemplate:latest \
+                --compressed-caching=false \
+                --context ./
+            """
+        )
+    }
+}
+
+def stagesFlexBuild(String flextemplate){
+    stage("docker build"){
+        container("kaniko") {
+            script{ dockerStage(flextemplate) } 
+        }
+    }
+    stage("FlexTemplate Build") {
+        container("gcloud") {   
+            script {
+                sh """
+                    gcloud dataflow flex-template build gs://$DATAFLOW_BUCKET/flex-template/${flextemplate}.json \
+                    --image $IMAGE_REGISTRY/$IMAGE_REPOSITORY/flex/$flextemplate \
+                    --sdk-language PYTHON \
+                    --metadata-file flex/$flextemplate/spec/metadata.json \
+                    --project $SERVICE_PROJECT
+                """
+            }
+        } 
+    }
+}
+
+pipeline {
+    agent { kubernetes { inheritFrom 'gcloud-minimal'; showRawYaml false } }
+    options {
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '200', artifactNumToKeepStr: '200'))
+    }
+    environment{
+        BRANCHES="dev|qas|pro"
+        DIRECTORIOS="flex/**"
+    }
+    stages{
+        stage("init pipeline"){
+            when {
+                allOf {
+                branch pattern: BRANCHES, comparator: "REGEXP"
+                changeset pattern: DIRECTORIOS                   
+                }
+            }
+            steps {
+            script { readVarsFromYaml("jenkins/environments/$BRANCH_NAME/variables.yaml") }
+            }
+            post{
+                unsuccessful {
+                script{ googleChatUtils.unsuccessfullNotification('google-chat-wh') }
+                }
+            }
+        }
+        stage("merge"){
+            when {
+                allOf {
+                branch pattern: BRANCHES, comparator: "REGEXP"
+                changeset pattern: DIRECTORIOS
+                }
+            }
+
+            parallel{
+                stage("hana-flex-template"){
+                    when {
+                        allOf {
+                        changeset pattern: "flex/hana-flex-template/**"
+                        }
+                        beforeAgent true
+                    }
+                    agent { kubernetes { inheritFrom 'gcloud-minimal'; showRawYaml false; serviceAccount "$PIPELINE_K8S_SA" } }
+                    steps {
+                        stagesFlexBuild("hana-flex-template")
+                    }
+                    post{
+                        unsuccessful { script{ googleChatUtils.unsuccessfullNotification('google-chat-wh', "hana-flex-template") } }
+                        success { script{ googleChatUtils.successfullNotification('google-chat-wh', "hana-flex-template") } }
+                    }
+                }
+                stage("api-flex-template"){
+                    when {
+                        allOf {
+                        changeset pattern: "flex/api-flex-template/**"
+                        }
+                        beforeAgent true
+                    }
+                    agent { kubernetes { inheritFrom 'gcloud-minimal'; showRawYaml false; serviceAccount "$PIPELINE_K8S_SA" } }
+                    steps {
+                        stagesFlexBuild("api-flex-template")
+                    }
+                    post{
+                        unsuccessful { script{ googleChatUtils.unsuccessfullNotification('google-chat-wh', "api-flex-template") } }
+                        success { script{ googleChatUtils.successfullNotification('google-chat-wh', "api-flex-template") } }
+                    }
+                }
+                stage("csv-flex-template"){
+                    when {
+                        allOf {
+                        changeset pattern: "flex/csv-flex-template/**"
+                        }
+                        beforeAgent true
+                    }
+                    agent { kubernetes { inheritFrom 'gcloud-minimal'; showRawYaml false; serviceAccount "$PIPELINE_K8S_SA" } }
+                    steps {
+                        stagesFlexBuild("csv-flex-template")
+                    }
+                    post{
+                        unsuccessful { script{ googleChatUtils.unsuccessfullNotification('google-chat-wh', "csv-flex-template") } }
+                        success { script{ googleChatUtils.successfullNotification('google-chat-wh', "csv-flex-template") } }
+                    }
+                }
+            }
+        }
+    }
+}  

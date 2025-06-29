@@ -1,0 +1,116 @@
+{
+  "name": "CSV flex template",
+  "description": "CSV pipeline",
+  "parameters": [
+    {
+        "name": "dataflow_bucket_name",
+        "label": "dataflow_bucket_name",
+        "helpText": "gs://..."
+    },
+    {
+        "name": "dataflow_project",
+        "label": "dataflow_project",
+        "helpText": "Proyecto GCP"
+    },
+    {
+        "name": "target_project",
+        "label": "target_project",
+        "helpText": "Proyecto destino"
+    },
+    {
+        "name": "target_dataset",
+        "label": "target_dataset",
+        "helpText": "dataset destino"
+    },
+    {
+        "name": "target_table",
+        "label": "target_table",
+        "helpText": "Tabla destino"
+    },
+    {
+        "name": "pipeline_name",
+        "label": "pipeline_name",
+        "helpText": "nombre de pipeline"
+    },
+    {
+        "name": "stage",
+        "label": "stage",
+        "helpText": "stage (dev/qa/preprod/prod)"
+    },
+    {
+        "name": "temp_folder",
+        "label": "temp_folder",
+        "helpText": "gs://..."
+    },
+    {
+        "name": "origin_bucket",
+        "label": "origin_bucket",
+        "helpText": "origin_bucket"
+    },
+    {
+        "name": "prefix",
+        "label": "prefix",
+        "helpText": "prefix"
+    },
+    {
+        "name": "filename",
+        "label": "filename",
+        "helpText": "filename"
+    },
+    {
+        "name": "sufix",
+        "label": "sufix",
+        "helpText": "sufix"
+    },
+    {
+        "name": "separator",
+        "label": "separator",
+        "helpText": "separator"
+    },
+    {
+        "name": "ext",
+        "label": "ext",
+        "helpText": "ext"
+    },
+    {
+        "name": "datetime_format",
+        "label": "datetime_format",
+        "helpText": "datetime_format"
+    },
+    {
+        "name": "delimitator",
+        "label": "delimitator",
+        "helpText": "delimitator"
+    },
+    {
+        "name": "date_field_name",
+        "label": "date_field_name",
+        "helpText": "date_field_name"
+    },
+    {
+        "name": "allow_multi_date",
+        "label": "allow_multi_date",
+        "helpText": "allow_multi_date"
+    },
+    {
+        "name": "allow_accum_date",
+        "label": "allow_accum_date",
+        "helpText": "allow_accum_date"
+    },
+    {
+        "name": "allow_multi_file",
+        "label": "allow_multi_file",
+        "helpText": "allow_multi_file"
+    },
+    {
+        "name": "run_id",
+        "label": "run_id",
+        "helpText": "run_id"
+    },
+    {
+        "name": "control_schema_path",
+        "label": "control_schema_path",
+        "helpText": "control_schema_path"
+    }
+  ]
+}

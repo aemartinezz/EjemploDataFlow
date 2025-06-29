@@ -1,0 +1,5 @@
+{
+  "docker_template_spec": {
+    "docker_image": "us-east4-docker.pkg.dev/labuniformes/pocdataflow/hana-flex-template:latest"
+  }
+}
