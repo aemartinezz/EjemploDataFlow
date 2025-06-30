@@ -121,14 +121,21 @@ def read_from_hana(options):
     cursor.execute(options.query)
     columns = [desc[0] for desc in cursor.description]
 
-    results = []
-    for row in cursor.fetchall():
-        # Create a dictionary from the row values
-        row_dict = dict(zip(columns, row))
-        results.append(row_dict)
+    # Establecer el tamaño del array del cursor para optimizar la recuperación de datos de la red
+    # Usaremos un valor fijo de 100000 para fetch_size
+    fetch_size_hardcoded = 100000
+    cursor.arraysize = fetch_size_hardcoded
+    logging.info(f"Reading from HANA with fixed fetch_size: {fetch_size_hardcoded}")
+
+    while True:
+        rows = cursor.fetchmany(fetch_size_hardcoded)
+        if not rows:
+            break
+        for row in rows:
+            row_dict = dict(zip(columns, row))
+            yield row_dict
     
     cursor.close()
     conn.close()
-    return results
 
 
