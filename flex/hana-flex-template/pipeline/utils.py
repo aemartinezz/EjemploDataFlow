@@ -24,11 +24,57 @@ def default_converter(o):
     if isinstance(o, datetime):
         return o.isoformat()
         # return o.strftime("%Y-%m-%dT%H:%M:%SZ")
+    # Si tienes otros tipos que necesiten conversión especial para BQ, añádelos aquí.
+    # Por ejemplo, si tuvieras Decimal y BQ espera float o string:
+    # if isinstance(o, decimal.Decimal):
+    #     return float(o) # o str(o)
     raise TypeError("Object of type '%s' is not JSON serializable" % type(o).__name__)
 
 
-def to_bigquery_row(element):
-    return json.loads(json.dumps(element, default=default_converter))
+def to_bigquery_row(element: dict) -> dict:
+    """
+    Prepara un diccionario para ser escrito en BigQuery.
+    Convierte tipos de datos específicos (como datetime) a formatos compatibles con BigQuery.
+    Evita la costosa doble conversión JSON.
+    """
+    if not isinstance(element, dict):
+        logging.error(f"Elemento no es un diccionario: {type(element)}")
+        # Decide cómo manejar esto: retornar el elemento, un dict vacío, o lanzar error
+        return element
+
+    processed_element = {} # Crear un nuevo diccionario es más seguro
+    for key, value in element.items():
+        if isinstance(value, datetime):
+            processed_element[key] = value.isoformat()
+        # Si tienes otros tipos que default_converter manejaba y necesitan conversión,
+        # añade lógica aquí. Ejemplo:
+        # elif isinstance(value, decimal.Decimal):
+        #     processed_element[key] = float(value)
+        elif value is not None:
+            # Si no es un tipo especial y no es None, se pasa tal cual.
+            # BigQuery maneja bien int, float, str, bool, bytes, list, dict (compatibles con JSON).
+            # Si algún valor pudiera ser de un tipo no compatible directamente Y que
+            # antes se \"arreglaba\" con json.dumps + default_converter, considera
+            # convertirlo a string como fallback o manejarlo explícitamente.
+            if not isinstance(value, (str, int, float, bool, bytes, list, dict)):
+                try:
+                    # Esta llamada es si default_converter es más complejo y quieres reusarlo
+                    # para tipos no datetime. Si default_converter SOLO hace datetime,
+                    # entonces esta llamada no es necesaria aquí, ya que datetime ya se manejó.
+                    # Si default_converter es solo para datetime, un simple str(value) podría ser suficiente
+                    # o manejar el tipo específico.
+                    # processed_element[key] = default_converter(value) # Comentado si default_converter es solo para datetime
+                    logging.warning(f"Valor para la clave '{key}' es de tipo no básico y no datetime: {type(value)}. Convirtiendo a string.")
+                    processed_element[key] = str(value) # Fallback general
+                except TypeError: # En caso que default_converter falle para este tipo
+                    logging.error(f"No se pudo convertir (TypeError) el valor para la clave '{key}': {value}. Convirtiendo a string.")
+                    processed_element[key] = str(value)
+            else:
+                processed_element[key] = value # Tipos básicos se mantienen
+        else:
+            processed_element[key] = None # Nones se mantienen
+
+    return processed_element
 
 
 def get_secret(dataflow_project, secret_name_origin):
@@ -122,8 +168,8 @@ def read_from_hana(options):
     columns = [desc[0] for desc in cursor.description]
 
     # Establecer el tamaño del array del cursor para optimizar la recuperación de datos de la red
-    # Usaremos un valor fijo de 100000 para fetch_size
-    fetch_size_hardcoded = 100000
+    # Ajustado a 5000 para mitigar problemas de OOM
+    fetch_size_hardcoded = 5000
     cursor.arraysize = fetch_size_hardcoded
     logging.info(f"Reading from HANA with fixed fetch_size: {fetch_size_hardcoded}")
 
